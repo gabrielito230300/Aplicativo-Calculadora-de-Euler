@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Congruências — Prof. Gabriel Martins</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Lora:ital,wght@0,600;1,400&display=swap" rel="stylesheet" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(','\\)'], ['$','$']], displayMath: [['\\[','\\]'], ['$$','$$']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f4f0;
+      --surface: #ffffff;
+      --surface2: #f0eff9;
+      --border: #dcdae8;
+      --accent: #5647d6;
+      --accent-light: #7c70e8;
+      --accent-glow: rgba(86, 71, 214, 0.08);
+      --accent-banner: rgba(86, 71, 214, 0.06);
+      --green: #1a7f4b;
+      --green-bg: rgba(26, 127, 75, 0.08);
+      --green-border: rgba(26, 127, 75, 0.25);
+      --yellow: #92600a;
+      --yellow-bg: rgba(146, 96, 10, 0.08);
+      --yellow-border: rgba(146, 96, 10, 0.25);
+      --text: #1c1b2e;
+      --text-muted: #6b6882;
+      --text-hint: #9997b0;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', sans-serif;
+      --serif: 'Lora', Georgia, serif;
+      --radius: 10px;
+      --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1.25rem 5rem;
+    }
+
+    /* ── HEADER ── */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      max-width: 620px;
+      width: 100%;
+    }
+
+    .professor-block {
+      margin-bottom: 1.6rem;
+    }
+
+    .professor-name {
+      font-family: var(--serif);
+      font-size: clamp(1.15rem, 3vw, 1.45rem);
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.01em;
+      margin-bottom: 3px;
+    }
+
+    .professor-sub {
+      font-size: 12px;
+      color: var(--text-hint);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-family: var(--mono);
+    }
+
+    .professor-divider {
+      width: 40px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+      margin: 8px auto 0;
+      opacity: 0.35;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.18em;
+      color: var(--accent-light);
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 4vw, 2.1rem);
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 0.7rem;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .formula-banner {
+      display: inline-block;
+      background: var(--accent-banner);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 0.8rem 1.4rem;
+      color: var(--accent);
+      margin: 1.4rem auto 0;
+      font-size: 15px;
+    }
+
+    /* ── CARD INPUTS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: var(--shadow);
+    }
+
+    .inputs-label {
+      font-size: 11px;
+      color: var(--text-hint);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      font-family: var(--mono);
+    }
+
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      font-family: var(--mono);
+    }
+
+    .field input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 20px;
+      font-weight: 600;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      -moz-appearance: textfield;
+    }
+
+    .field input::-webkit-inner-spin-button,
+    .field input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 13px;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.1s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn:hover { background: var(--accent-light); }
+    .btn:active { transform: scale(0.98); }
+
+    /* ── OUTPUT ── */
+    #output { width: 100%; max-width: 600px; margin-top: 1.5rem; }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .result-header {
+      background: var(--accent-banner);
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 1.75rem;
+    }
+
+    .result-expression {
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 5px;
+      font-family: var(--serif);
+    }
+
+    .result-prose {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .method-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      padding: 2px 9px;
+      border-radius: 20px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .badge-euler { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-direct { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-border); }
+
+    .steps-section { padding: 0 1.75rem 1.75rem; }
+
+    .steps-title {
+      font-size: 10.5px;
+      color: var(--text-hint);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-family: var(--mono);
+      padding: 1.25rem 0 0.85rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+
+    /* ── STEP ── */
+    .step {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0 10px;
+    }
+
+    .step:last-child { border-bottom: none; }
+
+    .step-top {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 12px;
+      align-items: baseline;
+    }
+
+    .step-label {
+      color: var(--text-hint);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding-top: 2px;
+    }
+
+    .step-val {
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* Linha de explicação abaixo da fórmula */
+    .step-hint {
+      margin-top: 5px;
+      margin-left: 202px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      font-style: italic;
+    }
+
+    .tag-ok {
+      display: inline-block;
+      background: var(--green-bg);
+      color: var(--green);
+      font-size: 11px;
+      padding: 1px 8px;
+      border-radius: 20px;
+      margin-left: 6px;
+      border: 1px solid var(--green-border);
+    }
+
+    .tag-warn {
+      display: inline-block;
+      background: var(--yellow-bg);
+      color: var(--yellow);
+      font-size: 11px;
+      padding: 1px 8px;
+      border-radius: 20px;
+      margin-left: 6px;
+      border: 1px solid var(--yellow-border);
+    }
+
+    .error-msg {
+      background: rgba(200,30,30,0.06);
+      border: 1px solid rgba(200,30,30,0.2);
+      color: #b91c1c;
+      border-radius: var(--radius);
+      padding: 0.85rem 1.1rem;
+      font-size: 14px;
+      font-family: var(--mono);
+    }
+
+    footer {
+      margin-top: 3rem;
+      font-size: 12px;
+      color: var(--text-hint);
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 520px) {
+      .inputs-grid { grid-template-columns: 1fr 1fr; }
+      .step-top { grid-template-columns: 1fr; gap: 4px; }
+      .step-hint { margin-left: 0; }
+      h1 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="professor-block">
+    <div class="professor-name">Prof. Gabriel Martins</div>
+    <div class="professor-sub">Teoria dos Números · Aritmética Modular</div>
+    <div class="professor-divider"></div>
+  </div>
+  <div class="eyebrow">Ferramenta didática</div>
+  <h1>Calculadora de Congruências</h1>
+  <p class="subtitle">Calcula o resto de \(a^n \div m\) aplicando o <strong>Teorema de Euler</strong> com redução do expoente via \(\varphi(m)\), exibindo cada etapa do raciocínio.</p>
+  <div class="formula-banner">
+    \(\displaystyle a^{\,\varphi(m)} \equiv 1 \pmod{m}, \quad \text{se } \operatorname{mdc}(a,m) = 1\)
+  </div>
+</header>
+
+<div class="card">
+  <div class="inputs-label">Preencha os valores</div>
+  <div class="inputs-grid">
+    <div class="field">
+      <label>Base — \(a\)</label>
+      <input type="number" id="base" value="7" min="1" />
+    </div>
+    <div class="field">
+      <label>Expoente — \(n\)</label>
+      <input type="number" id="exp" value="100" min="0" />
+    </div>
+    <div class="field">
+      <label>Módulo — \(m\)</label>
+      <input type="number" id="mod" value="9" min="2" />
+    </div>
+  </div>
+  <button class="btn" onclick="calcular()">Calcular resto</button>
+</div>
+
+<div id="output"></div>
+
+<footer>
+  Desenvolvido por <strong>Prof. Gabriel Martins</strong><br>
+  Baseado em: Abramo Hefez — <em>Aritmética</em> (Coleção IMPA)
+</footer>
+
+<script>
+function mdc(a, b) {
+  a = BigInt(a); b = BigInt(b);
+  while (b) { [a, b] = [b, a % b]; }
+  return Number(a);
+}
+
+function phi(n) {
+  let result = n, temp = n;
+  for (let p = 2; p * p <= temp; p++) {
+    if (temp % p === 0) {
+      while (temp % p === 0) temp = Math.floor(temp / p);
+      result -= Math.floor(result / p);
+    }
+  }
+  if (temp > 1) result -= Math.floor(result / temp);
+  return result;
+}
+
+function factorize(n) {
+  let parts = [], temp = n;
+  for (let p = 2; p * p <= temp; p++) {
+    if (temp % p === 0) {
+      let e = 0;
+      while (temp % p === 0) { e++; temp = Math.floor(temp / p); }
+      parts.push(e > 1 ? `${p}^{${e}}` : `${p}`);
+    }
+  }
+  if (temp > 1) parts.push(`${temp}`);
+  return parts.length ? parts.join(' \\times ') : `${n}`;
+}
+
+function modpow(base, exp, mod) {
+  let result = 1n, b = BigInt(base) % BigInt(mod), e = BigInt(exp), m = BigInt(mod);
+  while (e > 0n) {
+    if (e % 2n === 1n) result = result * b % m;
+    e = e / 2n; b = b * b % m;
+  }
+  return Number(result);
+}
+
+// Passo com fórmula LaTeX + explicação em texto
+function step(label, latex, hint) {
+  return `<div class="step">
+    <div class="step-top">
+      <span class="step-label">${label}</span>
+      <span class="step-val">\\(${latex}\\)</span>
+    </div>
+    ${hint ? `<div class="step-hint">${hint}</div>` : ''}
+  </div>`;
+}
+
+// Passo com HTML livre (para badges, mixes de texto+fórmula)
+function stepHtml(label, html, hint) {
+  return `<div class="step">
+    <div class="step-top">
+      <span class="step-label">${label}</span>
+      <span class="step-val">${html}</span>
+    </div>
+    ${hint ? `<div class="step-hint">${hint}</div>` : ''}
+  </div>`;
+}
+
+function calcular() {
+  const a = parseInt(document.getElementById('base').value);
+  const n = parseInt(document.getElementById('exp').value);
+  const m = parseInt(document.getElementById('mod').value);
+  const out = document.getElementById('output');
+
+  if (isNaN(a) || isNaN(n) || isNaN(m) || a < 1 || n < 0 || m < 2) {
+    out.innerHTML = `<div class="error-msg">⚠ Valores inválidos. Use: base ≥ 1, expoente ≥ 0, módulo ≥ 2.</div>`;
+    return;
+  }
+
+  const g = mdc(a, m);
+  const resultado = modpow(a, n, m);
+  let stepsHTML = '';
+  let badge = '';
+
+  stepsHTML += step(
+    'Problema',
+    `${a}^{${n}} \\bmod ${m} = {?}`,
+    `Queremos encontrar o resto da divisão de \\(${a}^{${n}}\\) por \\(${m}\\), sem calcular a potência diretamente.`
+  );
+
+  stepsHTML += step(
+    'Fatoração de \\(m\\)',
+    `${m} = ${factorize(m)}`,
+    `Fatoramos \\(m\\) em primos para poder calcular \\(\\varphi(m)\\) usando a fórmula multiplicativa de Euler.`
+  );
+
+  if (g !== 1) {
+    badge = `<span class="method-badge badge-direct">Exp. Modular Rápida</span>`;
+
+    stepsHTML += stepHtml(
+      '\\(\\operatorname{mdc}(a,m)\\)',
+      `\\(\\operatorname{mdc}(${a},\\, ${m}) = ${g}\\) <span class="tag-warn">não coprimos</span>`,
+      `Como \\(${a}\\) e \\(${m}\\) não são coprimos, a hipótese do Teorema de Euler não é satisfeita. Não podemos garantir que \\(${a}^{\\varphi(${m})} \\equiv 1\\).`
+    );
+
+    stepsHTML += stepHtml(
+      'Método alternativo',
+      `Exponenciação modular binária`,
+      `Usamos o algoritmo de quadratura sucessiva (square-and-multiply): a cada passo, elevamos ao quadrado e reduzimos módulo \\(${m}\\), evitando números gigantes.`
+    );
+
+    stepsHTML += step(
+      'Resultado direto',
+      `${a}^{${n}} \\equiv ${resultado} \\pmod{${m}}`,
+      `Calculado por exponenciação modular eficiente em \\(O(\\log n)\\) multiplicações.`
+    );
+
+  } else {
+    const ph = phi(m);
+    const q = Math.floor(n / ph);
+    const r = n % ph;
+    const parcial = modpow(a, r, m);
+    badge = `<span class="method-badge badge-euler">Teorema de Euler</span>`;
+
+    stepsHTML += stepHtml(
+      '\\(\\operatorname{mdc}(a,m)\\)',
+      `\\(\\operatorname{mdc}(${a},\\, ${m}) = 1\\) <span class="tag-ok">coprimos ✓</span>`,
+      `A condição do Teorema de Euler está satisfeita: \\(${a}\\) e \\(${m}\\) são coprimos, portanto \\(${a}^{\\varphi(${m})} \\equiv 1 \\pmod{${m}}\\).`
+    );
+
+    stepsHTML += stepHtml(
+      '\\(\\varphi(m)\\) — Função de Euler',
+      `\\(\\varphi(${m}) = ${ph}\\)`,
+      `Há exatamente \\(${ph}\\) inteiros entre \\(1\\) e \\(${m}\\) coprimos com \\(${m}\\) — esses são os elementos do Sistema de Representantes Reduzido (SRR) de \\(${m}\\). É sobre esse conjunto que o Teorema de Euler atua.`
+    );
+
+    stepsHTML += step(
+      'Teorema de Euler',
+      `${a}^{\\varphi(${m})} = ${a}^{${ph}} \\equiv 1 \\pmod{${m}}`,
+      `Toda vez que o expoente de \\(${a}\\) é múltiplo de \\(\\varphi(${m}) = ${ph}\\), a potência é congruente a \\(1\\) módulo \\(${m}\\). Esta é a "alavanca" que nos permite reduzir o expoente.`
+    );
+
+    stepsHTML += step(
+      'Divisão do expoente',
+      `${n} = ${q} \\cdot ${ph} + ${r} \\;\\Rightarrow\\; r = ${r}`,
+      `Dividimos o expoente \\(${n}\\) por \\(\\varphi(${m}) = ${ph}\\): quociente \\(${q}\\), resto \\(${r}\\). Só o resto \\(r = ${r}\\) importará após a redução.`
+    );
+
+    stepsHTML += step(
+      'Redução (i)',
+      `${a}^{${n}} = ${a}^{\\,${q} \\cdot ${ph} \\,+\\, ${r}}`,
+      `Reescrevemos o expoente destacando o múltiplo de \\(\\varphi(${m})\\) mais o resto.`
+    );
+
+    stepsHTML += step(
+      'Redução (ii)',
+      `= \\left(${a}^{${ph}}\\right)^{${q}} \\cdot ${a}^{${r}}`,
+      `Separamos a potência usando a lei \\(x^{a+b} = x^a \\cdot x^b\\) e agrupamos o bloco \\(${a}^{${ph}}\\) que sabemos valer \\(1\\).`
+    );
+
+    stepsHTML += step(
+      'Redução (iii)',
+      `\\equiv 1^{${q}} \\cdot ${a}^{${r}} \\pmod{${m}}`,
+      `Aplicamos o Teorema de Euler: substituímos \\(${a}^{${ph}}\\) por \\(1\\). O fator \\(1^{${q}} = 1\\) some, e sobra apenas \\(${a}^{${r}}\\).`
+    );
+
+    stepsHTML += step(
+      'Redução (iv)',
+      `\\equiv ${a}^{${r}} \\pmod{${m}}`,
+      `Conclusão da redução: calcular \\(${a}^{${n}} \\bmod ${m}\\) é equivalente a calcular \\(${a}^{${r}} \\bmod ${m}\\), com expoente muito menor.`
+    );
+
+    stepsHTML += step(
+      `Cálculo de \\(${a}^{${r}} \\bmod ${m}\\)`,
+      `${a}^{${r}} \\equiv ${parcial} \\pmod{${m}}`,
+      `Calculamos \\(${a}^{${r}} \\bmod ${m}\\) diretamente por exponenciação modular. O expoente reduzido \\(${r} < ${ph}\\) torna isso eficiente.`
+    );
+  }
+
+  stepsHTML += step(
+    'Resultado final',
+    `\\boxed{\\;${a}^{${n}} \\equiv ${resultado} \\pmod{${m}}\\;}`,
+    `O resto da divisão de \\(${a}^{${n}}\\) por \\(${m}\\) é \\(${resultado}\\).`
+  );
+
+  out.innerHTML = `
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-expression">
+          \\(${a}^{${n}} \\equiv ${resultado} \\pmod{${m}}\\)${badge}
+        </div>
+        <div class="result-prose">
+          O resto da divisão de \\(${a}^{${n}}\\) por \\(${m}\\) é <strong>${resultado}</strong>.
+        </div>
+      </div>
+      <div class="steps-section">
+        <div class="steps-title">Passo a passo detalhado</div>
+        ${stepsHTML}
+      </div>
+    </div>
+  `;
+
+  if (window.MathJax) {
+    MathJax.typesetPromise([document.getElementById('output')]);
+  }
+}
+
+calcular();
+</script>
+</body>
+</html>
